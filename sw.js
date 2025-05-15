@@ -1,6 +1,6 @@
 // sw.js - Service Worker for Daily Supplement & Medication Checklist (Enhanced)
 
-const CACHE_NAME = 'daily-checklist-cache-v1.6'; // Updated version
+const CACHE_NAME = 'daily-checklist-cache-v1.7'; // Updated version
 const PRECACHE_ASSETS = [
     '/', // Alias for index.html
     'index.html',
