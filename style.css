@@ -1,0 +1,71 @@
+/* style.css */
+/* Using Tailwind CSS via CDN, so this file is for minimal global styles or overrides. */
+
+/* Basic body styling (mostly handled by Tailwind in HTML) */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Styles for the task items if not fully covered by Tailwind or for specific states */
+.task-item {
+    transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.1s ease;
+}
+
+.task-item:hover {
+    /* transform: translateY(-2px); */ /* Subtle lift effect */
+}
+
+/* Ensure buttons have a consistent feel and good touch targets */
+button, input[type="checkbox"] {
+    cursor: pointer;
+    touch-action: manipulation; /* Improves responsiveness on touch devices */
+}
+
+/* Add a little more visual feedback on active/focus for non-Tailwind styled buttons if any */
+button:active {
+    transform: scale(0.98); /* Slight shrink on press */
+}
+
+/* Specific styling for the task input fields in the settings modal */
+#tasksSettingsList input[type="text"],
+#tasksSettingsList input[type="number"] {
+    padding: 0.6rem 0.75rem; /* Slightly more padding */
+    border: 1px solid #cbd5e0; /* Tailwind gray-300 */
+    border-radius: 0.375rem; /* Tailwind rounded-md */
+    background-color: white;
+    color: #1a202c; /* Tailwind gray-900 */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+html.dark #tasksSettingsList input[type="text"],
+html.dark #tasksSettingsList input[type="number"] {
+    border-color: #4a5568; /* Tailwind gray-600 */
+    background-color: #2d3748; /* Tailwind gray-700 */
+    color: #e2e8f0; /* Tailwind gray-100 */
+}
+
+#tasksSettingsList input:focus {
+    outline: none;
+    border-color: #4299e1; /* Tailwind blue-500 */
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Ring effect - Tailwind focus:ring-blue-500 */
+}
+
+/* Styling for the "remove task" button in settings */
+.remove-task-btn {
+    background-color: #ef4444; /* Tailwind red-500 */
+    color: white;
+    padding: 0.5rem 0.75rem; /* Adjusted padding */
+    border-radius: 0.375rem; /* Tailwind rounded-md */
+    font-size: 0.875rem; /* Tailwind text-sm */
+    border: none;
+    transition: background-color 0.2s ease;
+}
+.remove-task-btn:hover {
+    background-color: #dc2626; /* Tailwind red-600 */
+}
+.remove-task-btn svg { /* Style for potential icon in remove button */
+    display: inline-block;
+    vertical-align: middle;
+}
