@@ -1,0 +1,44 @@
+{
+  "name": "Daily Supplement & Medication Checklist",
+  "short_name": "DailyChecklist",
+  "description": "A personal, offline-first progressive web app to manage your daily supplement and medication schedule with relative timing and notifications.",
+  "lang": "en-US",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F3F4F6",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    // {
+    //   "src": "screenshot1.png",
+    //   "sizes": "1280x720",
+    //   "type": "image/png",
+    //   "form_factor": "wide",
+    //   "label": "Desktop view of the checklist"
+    // },
+    // {
+    //   "src": "screenshot2_mobile.png",
+    //   "sizes": "720x1280",
+    //   "type": "image/png",
+    //   "form_factor": "narrow",
+    //   "label": "Mobile view of the daily tasks"
+    // }
+  ],
+  "categories": ["health", "lifestyle", "utilities"],
+  "prefer_related_applications": false
+}
