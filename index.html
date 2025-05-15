@@ -6,88 +6,76 @@
     
     <title>Daily Supplement & Medication Checklist</title>
     <meta name="description" content="A personal, offline-first progressive web app to manage your daily supplement and medication schedule with relative timing and notifications.">
-    <meta name="theme-color" content="#4A90E2">
-    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#FFFFFF"> <link rel="manifest" href="manifest.webmanifest">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="DailyChecklist">
-    <link rel="apple-touch-icon" href="icon-192.svg"> <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default"> <meta name="apple-mobile-web-app-title" content="DailyChecklist">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <script>
+        // Tailwind dark mode configuration
+        // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+        if (localStorage.getItem('dailyChecklistTheme') === 'dark' || (!('dailyChecklistTheme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#1F2937'); // Dark theme color (Tailwind gray-800)
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#FFFFFF'); // Light theme color
+        }
+    </script>
     <style>
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; /* Light mode track */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888; /* Light mode thumb */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555; /* Light mode thumb hover */
-        }
-        html.dark ::-webkit-scrollbar-track {
-            background: #2d3748; /* Dark mode track - Tailwind gray-700 */
-        }
-        html.dark ::-webkit-scrollbar-thumb {
-            background: #718096; /* Dark mode thumb - Tailwind gray-500 */
-        }
-        html.dark ::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0; /* Dark mode thumb hover - Tailwind gray-400 */
-        }
-
-        .task-item.done {
-            text-decoration: line-through;
-            opacity: 0.7;
-        }
-        .task-item.done .text-gray-800 { /* Ensure specificity or direct class use */
-            color: #a0aec0; /* Tailwind gray-500 */
-        }
-        html.dark .task-item.done .dark\:text-gray-200 {
-             color: #718096; /* Tailwind gray-500 for dark mode completed text */
-        }
-
+        /* Base body styles for smooth transitions (applied via JS too) */
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: #FFFFFF; /* Default light bg */
+            color: #111827; /* Default light text (gray-900) */
+        }
+        html.dark body {
+            background-color: #111827; /* Dark bg (gray-900) */
+            color: #F3F4F6; /* Dark text (gray-100) */
         }
 
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; border-radius: 10px; } /* Tailwind gray-200 */
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 10px; } /* Tailwind gray-400 */
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; } /* Tailwind gray-500 */
+        html.dark ::-webkit-scrollbar-track { background: #374151; } /* Tailwind gray-700 */
+        html.dark ::-webkit-scrollbar-thumb { background: #6b7280; } /* Tailwind gray-500 */
+        html.dark ::-webkit-scrollbar-thumb:hover { background: #9ca3af; } /* Tailwind gray-400 */
+
+        .task-item.done { text-decoration: line-through; opacity: 0.6; }
+        .task-item.done .task-label { color: #6b7280; } /* Tailwind gray-500 */
+        html.dark .task-item.done .task-label { color: #9ca3af; } /* Tailwind gray-400 */
+
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6); /* Slightly darker backdrop */
-            align-items: center;
-            justify-content: center;
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.65); align-items: center; justify-content: center;
         }
         .modal-content {
-            margin: auto;
-            padding: 20px; /* Tailwind p-5 */
-            border-radius: 0.5rem; /* Tailwind rounded-lg */
-            width: 90%;
-            max-width: 500px;
+            margin: auto; padding: 24px; /* p-6 */ border-radius: 0.5rem; /* rounded-lg */
+            width: 90%; max-width: 520px; /* Increased max-width slightly */
+            /* Base color set by Tailwind in the element */
         }
-        .modal.active {
-            display: flex;
-            animation: fadeInModal 0.3s ease-out;
-        }
+        .modal.active { display: flex; animation: fadeInModal 0.25s ease-out; }
         @keyframes fadeInModal {
-            from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+            from { opacity: 0; transform: translateY(-15px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        /* Focus ring consistency */
+        input:focus, button:focus-visible {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            --tw-ring-color: rgb(59 130 246 / 0.5); /* Tailwind blue-500 with opacity */
+            box-shadow: 0 0 0 2px var(--tw-ring-color);
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
     <div class="container mx-auto p-4 max-w-2xl min-h-screen flex flex-col">
         <header class="mb-6 text-center">
@@ -95,94 +83,97 @@
             <p class="text-gray-600 dark:text-gray-400 mt-1">Your personal supplement & medication schedule</p>
         </header>
 
-        <div id="controls-bar" class="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-3">
-            <button id="startDayBtn" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75">
-                Start Day
-            </button>
-            <button id="resetDayBtn" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 hidden">
-                Reset Day
-            </button>
-            <button id="settingsBtn" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-                Settings
-            </button>
-            <button id="themeToggleBtn" class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75">
-                Toggle Theme
-            </button>
+        <div id="controls-bar" class="mb-6 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-sm flex flex-col sm:flex-row justify-around items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <button id="startDayBtn" class="btn-primary w-full sm:w-auto bg-green-500 hover:bg-green-600">Start Day</button>
+            <button id="resetDayBtn" class="btn-danger w-full sm:w-auto bg-red-500 hover:bg-red-600 hidden">Reset Day</button>
+            <button id="editTasksBtn" class="btn-secondary w-full sm:w-auto bg-purple-500 hover:bg-purple-600">Manage Tasks</button>
+            <button id="settingsBtn" class="btn-secondary w-full sm:w-auto bg-gray-500 hover:bg-gray-600">Settings</button>
         </div>
 
-        <div id="wakeTimeDisplayContainer" class="mb-4 p-3 bg-blue-100 dark:bg-blue-800 border border-blue-300 dark:border-blue-700 rounded-lg text-center hidden">
-            <p class="text-blue-700 dark:text-blue-200 font-medium">Wake Up Time: <span id="wakeTimeDisplay" class="font-bold">Not Set</span></p>
+        <div id="wakeTimeDisplayContainer" class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-700 rounded-lg text-center hidden">
+            <p class="text-blue-700 dark:text-blue-300 font-medium">Wake Up Time: <span id="wakeTimeDisplay" class="font-bold">Not Set</span></p>
         </div>
         
-        <div id="infoMessage" aria-live="polite" class="mb-4 p-3 rounded-lg text-center hidden" role="alert">
-        </div>
+        <div id="infoMessage" aria-live="polite" class="mb-4 p-3 rounded-lg text-center hidden" role="alert"></div>
 
-
-        <div id="checklist-container" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 flex-grow">
+        <main id="checklist-container" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 flex-grow">
             <h2 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Today's Tasks</h2>
             <ul id="checklist" class="space-y-3">
-                <li class="p-3 bg-gray-50 dark:bg-gray-700 rounded-md text-center text-gray-500 dark:text-gray-400">
-                    Start your day or adjust settings to see tasks.
+                 <li class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-md text-center text-gray-500 dark:text-gray-400">
+                    Start your day or manage tasks to see your schedule.
                 </li>
             </ul>
-        </div>
+        </main>
 
         <footer class="text-center py-4 mt-8">
-            <p class="text-sm text-gray-500 dark:text-gray-400">&copy; <span id="currentYear"></span> Daily Checklist. All rights reserved (locally!).</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">&copy; <span id="currentYear"></span> Daily Checklist. Your data stays on your device.</p>
         </footer>
 
-        <div id="timePickerModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="timePickerModalTitle" aria-describedby="timePickerModalDescription">
-            <div class="modal-content bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6">
-                <h3 id="timePickerModalTitle" class="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Set Your Wake Up Time</h3>
-                <p id="timePickerModalDescription" class="text-sm text-gray-600 dark:text-gray-400 mb-4">Select the time you woke up or plan to wake up today.</p>
-                <input type="time" id="wakeTimeInput" class="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-md mb-6 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none" aria-label="Wake up time">
+        <div id="timePickerModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="timePickerModalTitle">
+            <div class="modal-content bg-white dark:bg-gray-800 shadow-xl">
+                <h3 id="timePickerModalTitle" class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Set Wake Up Time</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Select the time you woke up or plan to wake up.</p>
+                <input type="time" id="wakeTimeInput" class="input-field w-full p-2.5 mb-6 bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600" aria-label="Wake up time">
                 <div class="flex justify-end space-x-3">
-                    <button id="cancelTimePick" class="bg-gray-300 hover:bg-gray-400 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
-                    <button id="confirmTimePick" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-400">Confirm</button>
+                    <button id="cancelTimePick" class="btn-neutral bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">Cancel</button>
+                    <button id="confirmTimePick" class="btn-primary bg-green-500 hover:bg-green-600">Confirm</button>
                 </div>
             </div>
         </div>
 
-        <div id="pastDueModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pastDueModalTitle" aria-describedby="pastDueModalDescription">
-            <div class="modal-content bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6">
+        <div id="pastDueModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pastDueModalTitle">
+            <div class="modal-content bg-white dark:bg-gray-800 shadow-xl">
                 <h3 id="pastDueModalTitle" class="text-xl font-semibold mb-2 text-red-600 dark:text-red-400">Missed Tasks</h3>
-                <p id="pastDueModalDescription" class="mb-4 text-sm text-gray-600 dark:text-gray-400">It seems you started your day a bit late, or some tasks were due before now. Please review and mark any tasks you've already completed.</p>
-                <ul id="pastDueTaskList" class="space-y-2 mb-4 max-h-60 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                    </ul>
+                <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">Review tasks due before now and mark any completed.</p>
+                <ul id="pastDueTaskList" class="space-y-2 mb-4 max-h-60 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-700/50 rounded-md border border-gray-200 dark:border-gray-600"></ul>
                 <div class="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mt-4">
-                     <button id="checkAllPastDue" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Mark All as Done</button>
-                    <button id="closePastDueModal" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-400">Acknowledge & Continue</button>
+                     <button id="checkAllPastDue" class="btn-secondary w-full sm:w-auto bg-blue-500 hover:bg-blue-600">Mark All as Done</button>
+                    <button id="closePastDueModal" class="btn-primary w-full sm:w-auto bg-green-500 hover:bg-green-600">Acknowledge</button>
                 </div>
             </div>
         </div>
 
-        <div id="settingsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
-            <div class="modal-content bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6">
-                <h3 id="settingsModalTitle" class="text-xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Application Settings</h3>
+        <div id="taskManagementModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="taskManagementModalTitle">
+            <div class="modal-content bg-white dark:bg-gray-800 shadow-xl">
+                <h3 id="taskManagementModalTitle" class="text-xl font-semibold mb-5 text-gray-800 dark:text-gray-100">Manage Your Tasks</h3>
+                <div id="tasksSettingsList" class="space-y-4 max-h-80 overflow-y-auto mb-5 p-1">
+                    </div>
+                <button id="addNewTaskBtnTM" class="btn-primary w-full bg-green-500 hover:bg-green-600 text-sm py-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1 -mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                    Add New Task
+                </button>
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-6">
+                    <button id="cancelTaskManagement" class="btn-neutral w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">Cancel</button>
+                    <button id="saveTaskManagement" class="btn-primary w-full sm:w-auto bg-blue-500 hover:bg-blue-600">Save Tasks</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="settingsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitleApp">
+            <div class="modal-content bg-white dark:bg-gray-800 shadow-xl">
+                <h3 id="settingsModalTitleApp" class="text-xl font-semibold mb-6 text-gray-800 dark:text-gray-100">App Settings</h3>
                 
                 <div class="mb-6">
-                    <h4 class="text-lg font-medium mb-3 text-gray-600 dark:text-gray-400">Manage Tasks</h4>
-                    <div id="tasksSettingsList" class="space-y-3 max-h-72 overflow-y-auto mb-4 p-3 border border-gray-200 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900">
-                        </div>
-                    <button id="addNewTaskBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 px-3 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-green-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                        </svg>
-                        Add New Task
-                    </button>
+                    <h4 class="text-lg font-medium mb-3 text-gray-700 dark:text-gray-300">Appearance</h4>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <label for="themeToggleSwitch" class="text-gray-800 dark:text-gray-200">Dark Mode</label>
+                        <button id="themeToggleSwitch" role="switch" aria-checked="false" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 ease-in-out bg-gray-200 dark:bg-gray-600">
+                            <span class="sr-only">Toggle Dark Mode</span>
+                            <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ease-in-out translate-x-1 dark:translate-x-6"></span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="mb-6">
-                    <h4 class="text-lg font-medium mb-3 text-gray-600 dark:text-gray-400">Notifications</h4>
-                    <button id="requestNotificationPermissionBtn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2.5 px-3 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2">
+                <div class="mb-1">
+                    <h4 class="text-lg font-medium mb-3 text-gray-700 dark:text-gray-300">Notifications</h4>
+                    <button id="requestNotificationPermissionBtn" class="btn-secondary w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2.5 text-sm mb-2">
                         Request Permission
                     </button>
-                    <p id="notificationStatus" class="text-xs text-gray-500 dark:text-gray-400">Status: Unknown</p>
+                    <p id="notificationStatus" class="text-xs text-center text-gray-500 dark:text-gray-400">Status: Unknown</p>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-8">
-                    <button id="cancelSettings" class="w-full sm:w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
-                    <button id="saveSettings" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400">Save & Close</button>
+                <div class="flex justify-end mt-8">
+                    <button id="closeSettings" class="btn-primary bg-blue-500 hover:bg-blue-600">Close</button>
                 </div>
             </div>
         </div>
